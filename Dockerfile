@@ -11,7 +11,7 @@ RUN npm install -g @nestjs/cli && npm install
 COPY . .
 
 
-RUN npx prisma generate
+RUN npx prisma migrate
 
 
 RUN npm run build
