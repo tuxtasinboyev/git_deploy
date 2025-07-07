@@ -1,0 +1,45 @@
+name: Hello
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DB_HOST }}
+          username: ${{ secrets.DB_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            echo "🚀 Creating project folder if it doesn't exist..."
+            mkdir -p /home/ubuntu/nest_dars
+            cd /home/ubuntu/nest_dars
+
+            if [ ! -d .git ]; then
+              echo "📦 Cloning repository..."
+              git clone https://github.com/DaminboevM/nest_dars.git .
+            else
+              echo "🔄 Pulling latest changes..."
+              git pull origin main
+            fi
+
+            echo "📦 Installing dependencies..."
+            npm install
+
+            echo "⚙️ Building project..."
+            npm run build
+
+            echo "🟢 Starting app with PM2..."
+            pm2 start dist/main.js --name nest_dars || pm2 restart nest_dars
+
+            echo "💾 Saving PM2 process list..."
+            pm2 save
