@@ -3,8 +3,8 @@ name: Hello
 on:
   push:
     branches:
-      - main
-
+      - omadbek  
+      
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -26,10 +26,15 @@ jobs:
 
             if [ ! -d .git ]; then
               echo "📦 Cloning repository..."
-              git clone https://github.com/tuxtasinboyev/git_deploy.git .
+              git clone -b main https://github.com/tuxtasinboyev/git_deploy.git .
             else
               echo "🔄 Pulling latest changes..."
-              git pull origin omadbek
+              git pull origin main
+            fi
+
+            echo "📦 Installing PM2 globally if not available..."
+            if ! command -v pm2 &> /dev/null; then
+              sudo npm install -g pm2
             fi
 
             echo "📦 Installing dependencies..."
@@ -43,4 +48,3 @@ jobs:
 
             echo "💾 Saving PM2 process list..."
             pm2 save
-
