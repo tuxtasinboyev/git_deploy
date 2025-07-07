@@ -35,7 +35,8 @@ services:
     command: >
       sh -c "
         npx prisma generate &&
-        npx prisma migrate deploy &&
+        until npx prisma migrate deploy; do echo '🔁 Waiting for Postgres...'; sleep 2; done &&
+        npm run build &&
         npm run start:prod
       "
 
